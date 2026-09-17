@@ -66,6 +66,7 @@ OS-PRO AC Motor (230V)
 | Relay | 32 | Motor ON/OFF | HIGH = motor on |
 
 ---
+<img width="1408" height="768" alt="visual-0" src="https://github.com/user-attachments/assets/d6d1f9a3-0b6b-424d-a1c3-828983a6508c" />
 
 ## Fault Detection
 
