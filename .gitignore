@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+env/
+.env
+
+# Trained ML models (large binary files)
+raspberry-pi/models/*.joblib
+raspberry-pi/models/*.pkl
+
+# Raw sensor data
+raspberry-pi/data/*.csv
+
+# Secrets — never commit
+secrets.h
+config_local.py
+
+# Arduino build artifacts
+build/
+*.elf
+*.bin
+*.map
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# InfluxDB local storage
+*.bolt
+*.sqlite
+engine/
+
+# Logs
+*.log

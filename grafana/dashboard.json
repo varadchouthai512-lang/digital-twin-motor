@@ -1,0 +1,205 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB",
+      "label": "InfluxDB",
+      "description": "InfluxDB motor_data bucket",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "influxdb", "name": "InfluxDB", "version": "1.0.0" },
+    { "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+    { "type": "panel", "id": "stat", "name": "Stat", "version": "" }
+  ],
+  "annotations": { "list": [] },
+  "description": "Digital Twin — OS-PRO AC Motor Real-Time Dashboard | MIT-WPU TY B.Tech EEE 2025-26",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 55 },
+              { "color": "red", "value": 70 }
+            ]
+          },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"temp\")",
+          "refId": "A"
+        }
+      ],
+      "title": "🌡️ Winding Temperature (°C)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "red", "value": 0.65 }
+            ]
+          },
+          "unit": "amp",
+          "min": 0,
+          "max": 1.5
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"current\")",
+          "refId": "A"
+        }
+      ],
+      "title": "⚡ Line Current (A) — max 0.65A",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "rpm",
+          "min": 0,
+          "max": 2600
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"rpm\")",
+          "refId": "A"
+        }
+      ],
+      "title": "🔄 Shaft Speed (RPM) — rated 2400",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "options": { "0": { "text": "STABLE" }, "1": { "text": "DETECTED" } }, "type": "value" }
+          ]
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+      "id": 4,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value", "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"vibration\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "📳 Vibration (SW-420)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "options": { "0": { "text": "OFF" }, "1": { "text": "RUNNING" } }, "type": "value" }
+          ]
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+      "id": 5,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value", "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"motor_on\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "🔌 Motor State",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          },
+          "custom": { "displayMode": "color-text" }
+        }
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 12 },
+      "id": 6,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value", "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${DS_INFLUXDB}" },
+          "query": "from(bucket: \"motor_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"status\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "🚨 Fault Status",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "tags": ["digital-twin", "motor", "predictive-maintenance", "mit-wpu"],
+  "time": { "from": "now-10m", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Digital Twin — OS-PRO Motor 01",
+  "uid": "motor-twin-01",
+  "version": 1
+}

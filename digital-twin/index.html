@@ -1,0 +1,409 @@
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080c18;font-family:'Segoe UI',sans-serif;color:#c8d8f0;padding:12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #1a2540}
+.hdr-left h2{font-size:13px;font-weight:500;color:#7eb8f7;letter-spacing:2px}
+.hdr-left p{font-size:10px;color:#304060;letter-spacing:1px;margin-top:2px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.4s infinite;margin-right:6px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.live-label{font-size:10px;color:#22c55e;letter-spacing:1px}
+.main{display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px}
+.motor-wrap{background:#0c1220;border:1px solid #1a2540;border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center}
+.motor-canvas-wrap{position:relative;width:260px;height:260px;margin-bottom:12px}
+canvas#motorCanvas{border-radius:8px}
+.badge{padding:4px 16px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-align:center;margin-top:4px}
+.badge-ok{background:#0a2416;color:#22c55e;border:1px solid #22c55e}
+.badge-w{background:#271c06;color:#f59e0b;border:1px solid #f59e0b}
+.badge-cr{background:#200a0a;color:#ef4444;border:1px solid #ef4444}
+.motor-specs{width:100%;margin-top:10px}
+.spec-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111a30;font-size:10px}
+.spec-row:last-child{border-bottom:none}
+.spec-k{color:#304060}
+.spec-v{color:#7eb8f7;font-weight:500}
+.right-col{display:flex;flex-direction:column;gap:10px}
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gauge-card{background:#0c1220;border:1px solid #1a2540;border-radius:10px;padding:12px}
+.g-label{font-size:9px;color:#304060;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.g-val{font-size:26px;font-weight:500;line-height:1;margin-bottom:2px}
+.g-unit{font-size:9px;color:#304060}
+.g-bar{height:3px;background:#101a30;border-radius:2px;margin-top:8px;overflow:hidden}
+.g-fill{height:100%;border-radius:2px;transition:width .6s ease,background .4s}
+.sensor-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sensor-card{background:#0c1220;border:1px solid #1a2540;border-radius:8px;padding:10px;text-align:center}
+.s-ico{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
+.s-label{font-size:9px;color:#304060;letter-spacing:1px;margin-bottom:4px}
+.s-val{font-size:13px;font-weight:500}
+.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.chart-card{background:#0c1220;border:1px solid #1a2540;border-radius:10px;padding:12px}
+.c-title{font-size:9px;color:#304060;letter-spacing:1px;margin-bottom:8px}
+.alert-row{background:#0c1220;border:1px solid #1a2540;border-radius:10px;padding:12px}
+.a-title{font-size:9px;color:#304060;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between}
+.a-entry{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #0f1828;font-size:10px}
+.a-entry:last-child{border-bottom:none}
+.footer{text-align:center;font-size:9px;color:#1a2540;letter-spacing:1px;margin-top:10px}
+</style>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <h2>OS-PRO DIGITAL TWIN</h2>
+    <p>SINGLE PHASE AC MOTOR — 230V 50HZ — ASSET: MOTOR_01 — PLANT A / LINE 1</p>
+  </div>
+  <div><span class="live-dot"></span><span class="live-label">LIVE</span></div>
+</div>
+
+<div class="main">
+  <div class="motor-wrap">
+    <div class="motor-canvas-wrap">
+      <canvas id="motorCanvas" width="260" height="260"></canvas>
+    </div>
+    <div class="badge badge-ok" id="statusBadge">NORMAL OPERATION</div>
+    <div class="motor-specs">
+      <div class="spec-row"><span class="spec-k">Model</span><span class="spec-v">OS-PRO HI-SPEED</span></div>
+      <div class="spec-row"><span class="spec-k">Type</span><span class="spec-v">Single Phase AC</span></div>
+      <div class="spec-row"><span class="spec-k">Voltage</span><span class="spec-v">230V 50Hz</span></div>
+      <div class="spec-row"><span class="spec-k">Power</span><span class="spec-v">19W rated</span></div>
+      <div class="spec-row"><span class="spec-k">Max current</span><span class="spec-v">0.65A</span></div>
+      <div class="spec-row"><span class="spec-k">Rated RPM</span><span class="spec-v">2400 RPM</span></div>
+      <div class="spec-row"><span class="spec-k">Insulation</span><span class="spec-v">Class E</span></div>
+      <div class="spec-row"><span class="spec-k">Capacitor</span><span class="spec-v">2.5 mfd</span></div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="gauges">
+      <div class="gauge-card">
+        <div class="g-label">Winding temperature</div>
+        <div class="g-val" id="gTemp" style="color:#f59e0b">--</div>
+        <div class="g-unit">degrees Celsius</div>
+        <div class="g-bar"><div class="g-fill" id="bTemp" style="width:0%;background:#f59e0b"></div></div>
+      </div>
+      <div class="gauge-card">
+        <div class="g-label">Line current</div>
+        <div class="g-val" id="gCurr" style="color:#7eb8f7">--</div>
+        <div class="g-unit">Amps (max 0.65A)</div>
+        <div class="g-bar"><div class="g-fill" id="bCurr" style="width:0%;background:#7eb8f7"></div></div>
+      </div>
+      <div class="gauge-card">
+        <div class="g-label">Shaft speed</div>
+        <div class="g-val" id="gRpm" style="color:#22c55e">--</div>
+        <div class="g-unit">RPM (rated 2400)</div>
+        <div class="g-bar"><div class="g-fill" id="bRpm" style="width:0%;background:#22c55e"></div></div>
+      </div>
+      <div class="gauge-card">
+        <div class="g-label">Mechanical vibration</div>
+        <div class="g-val" id="gVib" style="color:#a78bfa">--</div>
+        <div class="g-unit">SW-420 sensor</div>
+        <div class="g-bar"><div class="g-fill" id="bVib" style="width:0%;background:#a78bfa"></div></div>
+      </div>
+    </div>
+
+    <div class="sensor-grid">
+      <div class="sensor-card">
+        <div class="s-ico" id="icoTemp" style="background:#271c06"></div>
+        <div class="s-label">DS18B20</div>
+        <div class="s-val" id="sTemp" style="color:#f59e0b">--°C</div>
+      </div>
+      <div class="sensor-card">
+        <div class="s-ico" id="icoCurr" style="background:#0a1a2a"></div>
+        <div class="s-label">ACS712 20A</div>
+        <div class="s-val" id="sCurr" style="color:#7eb8f7">--A</div>
+      </div>
+      <div class="sensor-card">
+        <div class="s-ico" id="icoRpm" style="background:#0a2416"></div>
+        <div class="s-label">A3144 Hall</div>
+        <div class="s-val" id="sRpm" style="color:#22c55e">-- RPM</div>
+      </div>
+      <div class="sensor-card">
+        <div class="s-ico" id="icoVib" style="background:#1a0a2a"></div>
+        <div class="s-label">SW-420</div>
+        <div class="s-val" id="sVib" style="color:#a78bfa">--</div>
+      </div>
+      <div class="sensor-card">
+        <div class="s-ico" id="icoRelay" style="background:#0a2416"></div>
+        <div class="s-label">Relay</div>
+        <div class="s-val" id="sRelay" style="color:#22c55e">ON</div>
+      </div>
+      <div class="sensor-card">
+        <div class="s-ico" id="icoHealth" style="background:#0a2416"></div>
+        <div class="s-label">Health</div>
+        <div class="s-val" id="sHealth" style="color:#22c55e;font-size:11px">GOOD</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="charts-row" style="margin-bottom:10px">
+  <div class="chart-card">
+    <div class="c-title">TEMPERATURE (°C)</div>
+    <div style="position:relative;height:80px"><canvas id="cTemp" role="img" aria-label="Temperature trend"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="c-title">CURRENT (A)</div>
+    <div style="position:relative;height:80px"><canvas id="cCurr" role="img" aria-label="Current trend"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="c-title">RPM</div>
+    <div style="position:relative;height:80px"><canvas id="cRpm" role="img" aria-label="RPM trend"></canvas></div>
+  </div>
+</div>
+
+<div class="alert-row">
+  <div class="a-title"><span>PREDICTIVE MAINTENANCE ALERT LOG</span><span id="alertCount" style="color:#304060">0 events</span></div>
+  <div id="alertBody"></div>
+</div>
+
+<div class="footer">ESP32 → MQTT (plantA/line1/motor_01/state) → MOSQUITTO → INFLUXDB → GRAFANA — MIT-WPU 2025-26</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const N=40,lb=[],tD=[],cD=[],rD=[];
+for(let i=0;i<N;i++){lb.push('');tD.push(null);cD.push(null);rD.push(null);}
+
+const mkC=(id,data,col)=>new Chart(document.getElementById(id),{
+  type:'line',
+  data:{labels:[...lb],datasets:[{data:[...data],borderColor:col,backgroundColor:col+'18',tension:0.4,fill:true,pointRadius:0,borderWidth:1.2}]},
+  options:{responsive:true,maintainAspectRatio:false,animation:false,
+    scales:{x:{display:false},y:{ticks:{color:'#2a3a55',font:{size:9}},grid:{color:'#0f1828'},border:{display:false}}},
+    plugins:{legend:{display:false}}}
+});
+const TC=mkC('cTemp',tD,'#f59e0b');
+const CC=mkC('cCurr',cD,'#7eb8f7');
+const RC=mkC('cRpm',rD,'#22c55e');
+
+function pushC(chart,arr,v){arr.push(v);if(arr.length>N)arr.shift();chart.data.datasets[0].data=[...arr];chart.update('none');}
+
+let angle=0,shaftAngle=0,motorRunning=true,heatLevel=0;
+let lastStatus='',alertCnt=0,tick=0,scenIdx=0;
+
+const canvas=document.getElementById('motorCanvas');
+const ctx=canvas.getContext('2d');
+const CX=130,CY=130;
+
+function drawMotor(rpm,temp,vib,running){
+  ctx.clearRect(0,0,260,260);
+
+  const heat=Math.min((temp-30)/60,1);
+  const bodyColor=heat>0.7?`rgb(${Math.round(80+heat*80)},${Math.round(40-heat*20)},${Math.round(30-heat*10)})`
+    :heat>0.4?`rgb(${Math.round(50+heat*60)},${Math.round(50+heat*10)},30)`
+    :'#1e3355';
+
+  ctx.fillStyle='#0a1020';
+  ctx.beginPath();ctx.ellipse(CX+4,CY+8,102,102,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle='#111d35';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,100,60,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle=bodyColor;
+  ctx.fillRect(CX-100,CY-20,200,80);
+
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.ellipse(CX,CY+60,100,60,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle='#0f1a30';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,100,60,0,0,Math.PI*2);ctx.fill();
+
+  ctx.strokeStyle='#2a4060';ctx.lineWidth=1;
+  for(let i=0;i<8;i++){
+    const a=i*Math.PI/4;
+    ctx.beginPath();
+    ctx.ellipse(CX,CY-20,100,60,0,a-0.05,a+0.05);ctx.stroke();
+  }
+
+  ctx.fillStyle='#162035';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,80,48,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle='#0d1628';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,60,36,0,0,Math.PI*2);ctx.fill();
+
+  const bladeCount=6;
+  if(running&&rpm>10){
+    ctx.save();ctx.translate(CX,CY-20);ctx.rotate(angle);
+    for(let i=0;i<bladeCount;i++){
+      ctx.save();ctx.rotate(i*Math.PI*2/bladeCount);
+      ctx.fillStyle='#1e4080';
+      ctx.beginPath();ctx.moveTo(-3,0);ctx.lineTo(3,0);ctx.lineTo(2,-34);ctx.lineTo(-2,-34);ctx.closePath();ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  ctx.fillStyle='#7eb8f7';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,8,8,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#4a90d9';
+  ctx.beginPath();ctx.ellipse(CX,CY-20,5,5,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle='#c0a050';
+  ctx.beginPath();
+  ctx.moveTo(CX-110,CY+55);ctx.lineTo(CX-110,CY+80);
+  ctx.lineTo(CX-90,CY+90);ctx.lineTo(CX+90,CY+90);
+  ctx.lineTo(CX+110,CY+80);ctx.lineTo(CX+110,CY+55);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#a08040';
+  ctx.beginPath();
+  ctx.moveTo(CX-110,CY+55);ctx.lineTo(CX-90,CY+65);
+  ctx.lineTo(CX+90,CY+65);ctx.lineTo(CX+110,CY+55);ctx.closePath();ctx.fill();
+
+  ctx.fillStyle='#c0a050';
+  ctx.beginPath();ctx.ellipse(CX-100,CY+72,12,12,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(CX+100,CY+72,12,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#806030';
+  ctx.beginPath();ctx.ellipse(CX-100,CY+72,6,6,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(CX+100,CY+72,6,6,0,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle='#162035';
+  ctx.beginPath();ctx.ellipse(CX,CY+60,80,46,0,0,Math.PI*2);ctx.fill();
+
+  const lc=heat>0.7?'#ef444488':heat>0.4?'#f59e0b66':'#7eb8f740';
+  ctx.strokeStyle=lc;ctx.lineWidth=0.5;
+  for(let r=20;r<=70;r+=10){
+    ctx.beginPath();ctx.ellipse(CX,CY+60,r,r*0.58,0,0,Math.PI*2);ctx.stroke();
+  }
+
+  if(vib&&running){
+    ctx.strokeStyle='#ef444455';ctx.lineWidth=2;
+    for(let i=0;i<3;i++){
+      const r=90+i*15;
+      ctx.beginPath();ctx.ellipse(CX,CY,r,r*0.7,0,0,Math.PI*2);ctx.stroke();
+    }
+  }
+
+  ctx.save();ctx.translate(CX,CY-20);ctx.rotate(shaftAngle);
+  ctx.fillStyle='#4a90d9';
+  ctx.fillRect(-3,-80,6,60);
+  ctx.fillStyle='#7eb8f7';
+  ctx.beginPath();ctx.ellipse(0,-80,5,5,0,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  if(heat>0.5){
+    const hc=ctx.createRadialGradient(CX,CY,0,CX,CY,100);
+    hc.addColorStop(0,`rgba(239,68,68,${(heat-0.5)*0.15})`);
+    hc.addColorStop(1,'rgba(239,68,68,0)');
+    ctx.fillStyle=hc;
+    ctx.beginPath();ctx.ellipse(CX,CY,100,80,0,0,Math.PI*2);ctx.fill();
+  }
+
+  ctx.fillStyle='rgba(0,0,0,0.6)';
+  ctx.fillRect(4,4,120,18);
+  ctx.fillStyle='#7eb8f7';ctx.font='9px Segoe UI';
+  ctx.fillText('OS-PRO HI-SPEED 230V AC',8,16);
+
+  ctx.fillStyle='rgba(0,0,0,0.6)';
+  ctx.fillRect(4,24,70,14);
+  const statusC=running?'#22c55e':'#ef4444';
+  ctx.fillStyle=statusC;ctx.font='8px Segoe UI';
+  ctx.fillText(running?'RUNNING':'STOPPED',8,34);
+}
+
+function setIco(id,col){document.getElementById(id).style.background=col;}
+
+function addAlert(status,temp,curr){
+  if(status===lastStatus)return;
+  lastStatus=status;alertCnt++;
+  document.getElementById('alertCount').textContent=alertCnt+' events';
+  const b=document.getElementById('alertBody');
+  const t=new Date().toLocaleTimeString();
+  let c=status.includes('FAULT')||status.includes('CRITICAL')?'#ef4444':status.includes('WARN')?'#f59e0b':'#22c55e';
+  const d=document.createElement('div');d.className='a-entry';
+  d.innerHTML=`<span style="color:#304060">${t}</span><span style="color:${c}">${status.replace(/_/g,' ')}</span><span style="color:#304060">${parseFloat(temp).toFixed(1)}°C / ${parseFloat(curr).toFixed(2)}A</span>`;
+  b.prepend(d);
+  while(b.children.length>8)b.removeChild(b.lastChild);
+}
+
+const SCENES=[
+  {temp:38.2,current:0.52,rpm:2350,vibration:0,motor_on:1,status:'NORMAL'},
+  {temp:37.5,current:0.50,rpm:2352,vibration:0,motor_on:1,status:'NORMAL'},
+  {temp:39.0,current:0.53,rpm:2348,vibration:0,motor_on:1,status:'NORMAL'},
+  {temp:38.8,current:0.51,rpm:2355,vibration:0,motor_on:1,status:'NORMAL'},
+  {temp:62.4,current:0.61,rpm:2300,vibration:0,motor_on:1,status:'WARN_TEMP'},
+  {temp:64.1,current:0.62,rpm:2290,vibration:0,motor_on:1,status:'WARN_TEMP'},
+  {temp:38.2,current:0.72,rpm:2270,vibration:0,motor_on:1,status:'WARN_OVERCURRENT'},
+  {temp:42.0,current:0.53,rpm:2360,vibration:1,motor_on:1,status:'WARN_VIBRATION'},
+  {temp:41.5,current:0.54,rpm:2355,vibration:1,motor_on:1,status:'WARN_VIBRATION'},
+  {temp:79.2,current:0.63,rpm:2100,vibration:0,motor_on:1,status:'CRITICAL_OVERHEAT'},
+  {temp:81.0,current:0.64,rpm:2050,vibration:0,motor_on:1,status:'CRITICAL_OVERHEAT'},
+  {temp:55.0,current:0.86,rpm:6,vibration:1,motor_on:0,status:'FAULT_JAM'},
+  {temp:38.0,current:0.51,rpm:2350,vibration:0,motor_on:1,status:'NORMAL'},
+];
+
+function update(raw){
+  const temp=parseFloat(raw.temp),curr=parseFloat(raw.current),rpm=Math.round(raw.rpm);
+  const vib=raw.vibration||0,motorOn=raw.motor_on!==undefined?raw.motor_on:1;
+  const status=raw.status||'NORMAL';
+
+  const ts=temp.toFixed(1),cs=curr.toFixed(2),rs=rpm.toString();
+
+  document.getElementById('gTemp').textContent=ts;
+  document.getElementById('gCurr').textContent=cs;
+  document.getElementById('gRpm').textContent=rs;
+  document.getElementById('gVib').textContent=vib?'HIGH':'LOW';
+  document.getElementById('sTemp').textContent=ts+'°C';
+  document.getElementById('sCurr').textContent=cs+'A';
+  document.getElementById('sRpm').textContent=rs+' RPM';
+  document.getElementById('sVib').textContent=vib?'DETECTED':'STABLE';
+  document.getElementById('sRelay').textContent=motorOn?'ON':'OFF';
+
+  const tc=temp>70?'#ef4444':temp>55?'#f59e0b':'#22c55e';
+  const cc=curr>0.65?'#ef4444':curr>0.5?'#f59e0b':'#7eb8f7';
+  document.getElementById('gTemp').style.color=tc;
+  document.getElementById('gCurr').style.color=cc;
+
+  document.getElementById('bTemp').style.width=Math.min(temp/100*100,100)+'%';
+  document.getElementById('bTemp').style.background=tc;
+  document.getElementById('bCurr').style.width=Math.min(curr/0.65*100,100)+'%';
+  document.getElementById('bCurr').style.background=cc;
+  document.getElementById('bRpm').style.width=Math.min(rpm/2400*100,100)+'%';
+  document.getElementById('bVib').style.width=vib?'100%':'8%';
+  document.getElementById('bVib').style.background=vib?'#ef4444':'#22c55e';
+  document.getElementById('gVib').style.color=vib?'#ef4444':'#22c55e';
+
+  const health=status==='NORMAL'?'GOOD':status.includes('WARN')?'FAIR':'POOR';
+  const hcol=status==='NORMAL'?'#22c55e':status.includes('WARN')?'#f59e0b':'#ef4444';
+  document.getElementById('sHealth').textContent=health;
+  document.getElementById('sHealth').style.color=hcol;
+  document.getElementById('sRelay').style.color=motorOn?'#22c55e':'#ef4444';
+
+  setIco('icoTemp',temp>70?'#200a0a':temp>55?'#271c06':'#271c06');
+  setIco('icoCurr',curr>0.65?'#200a0a':curr>0.5?'#271c06':'#0a1a2a');
+  setIco('icoRpm',motorOn?'#0a2416':'#200a0a');
+  setIco('icoVib',vib?'#200a0a':'#1a0a2a');
+  setIco('icoRelay',motorOn?'#0a2416':'#200a0a');
+  setIco('icoHealth',status==='NORMAL'?'#0a2416':status.includes('WARN')?'#271c06':'#200a0a');
+
+  const badge=document.getElementById('statusBadge');
+  badge.textContent=status.replace(/_/g,' ');
+  badge.className='badge '+(status.includes('CRITICAL')||status.includes('FAULT')?'badge-cr':status.includes('WARN')?'badge-w':'badge-ok');
+
+  motorRunning=motorOn&&rpm>5;
+  pushC(TC,tD,temp);pushC(CC,cD,curr);pushC(RC,rD,rpm);
+  addAlert(status,temp,curr);
+  drawMotor(rpm,temp,vib,motorRunning);
+}
+
+function animate(){
+  if(motorRunning){
+    const sc=SCENES[scenIdx%SCENES.length];
+    const spd=(sc.rpm/2400)*0.12;
+    angle+=spd;shaftAngle+=spd*0.5;
+    const vib=sc.vibration||0;
+    const temp=parseFloat(sc.temp)+(Math.random()*0.6-0.3);
+    drawMotor(sc.rpm,temp,vib,true);
+  }
+  requestAnimationFrame(animate);
+}
+
+function tick_fn(){
+  const base=SCENES[scenIdx%SCENES.length];
+  const d={
+    temp:(base.temp+(Math.random()*1.2-0.6)).toFixed(2),
+    current:(base.current+(Math.random()*0.015-0.0075)).toFixed(3),
+    rpm:Math.round(base.rpm+(Math.random()*6-3)),
+    vibration:base.vibration,motor_on:base.motor_on,status:base.status
+  };
+  update(d);tick++;
+  if(tick%18===0)scenIdx=(scenIdx+1)%SCENES.length;
+}
+
+tick_fn();
+animate();
+setInterval(tick_fn,1000);
+</script>
