@@ -4,6 +4,9 @@
 
 A real-time **predictive maintenance system** for an OS-PRO single phase AC induction motor using digital twin architecture. Sensor data from the physical motor flows through a complete IoT pipeline — ESP32 → MQTT → InfluxDB → Grafana — with a 3D animated digital twin dashboard that mirrors the motor's live state.
 
+<img width="1600" height="900" alt="WhatsApp Image 2026-09-17 at 00 12 51" src="https://github.com/user-attachments/assets/2f2fea0a-249c-4a84-b159-b7e8b5ae9885" />
+
+
 ---
 
 ## Hardware
