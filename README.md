@@ -66,7 +66,6 @@ OS-PRO AC Motor (230V)
 | Relay | 32 | Motor ON/OFF | HIGH = motor on |
 
 ---
-<img width="1408" height="768" alt="visual-0" src="https://github.com/user-attachments/assets/d6d1f9a3-0b6b-424d-a1c3-828983a6508c" />
 
 ## Fault Detection
 
@@ -80,6 +79,14 @@ Six fault states using multi-condition logic — eliminates false positives:
 | `WARN_VIBRATION` | Vibration HIGH | Alert |
 | `CRITICAL_OVERHEAT` | Temp ≥ 70°C | **Relay OFF** |
 | `FAULT_JAM` | RPM < 10 AND Current > 0.3A | **Relay OFF** |
+
+---
+## Circuit Diagram 
+
+<img width="1408" height="768" alt="visual-0" src="https://github.com/user-attachments/assets/d6d1f9a3-0b6b-424d-a1c3-828983a6508c" />
+
+a schematic idea to understand the wiring and the hardware level debugging
+
 
 ---
 
